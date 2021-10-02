@@ -1,9 +1,7 @@
 package com.example.producer.kafka.kafkaproducer;
 
-import org.apache.kafka.clients.consumer.ConsumerConfig;
-import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.apache.kafka.clients.consumer.ConsumerRecords;
-import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.clients.consumer.*;
+import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,6 +9,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import java.time.Duration;
 import java.util.Collections;
+import java.util.Map;
 import java.util.Properties;
 
 @SpringBootApplication
@@ -36,6 +35,15 @@ public class KafkaProducerApplication {
             for (ConsumerRecord<String, String> record : records) {
                 logger.info("recode value is {}", record.value());
             }
+            consumer.commitAsync((offsets, exception) -> {
+                if (exception != null) {
+                    logger.error("Commit failed");
+                    logger.error("Commit failed for offsets {}", offsets, exception);
+                }
+                else {
+                    logger.info("Commit succeed");
+                }
+            });
         }
     }
 
